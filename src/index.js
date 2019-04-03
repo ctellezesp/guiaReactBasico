@@ -17,22 +17,79 @@ class Twitter extends React.Component{
 		super(props);
 		this.myRef = React.createRef();
 		this.subirTweet = this.subirTweet.bind(this);
+		this.componentDidMount = this.componentDidMount.bind(this);
 		this.state = {
 			tweets: []
 		}
 	}
 
 	subirTweet(){
-		this.setState({
+		/*this.setState({
 			tweets: [
-				{user: 'Carlos', date: new Date().toString(), post: this.myRef.current.value}, 
+				{user_name: 'Carlos', created_at: new Date().toString(), description: this.myRef.current.value, id: 1000}, 
 				...this.state.tweets
 				]
-			});
+			});*/
+
+		let tweet = {
+			user_name: 'Carlos',
+			avatar: 'https://avatars0.githubusercontent.com/u/26472750?s=460&v=4',
+			description: this.myRef.current.value
+		}
+
+		let headers = {};
+		headers['Content-Type'] = 'application/json';
+
+		let options = {
+			headers: headers,
+			method: 'POST',
+			body: JSON.stringify(tweet)
+		}
+
+		fetch('https://still-garden-88285.herokuapp.com/draft_tweets', options)
+		.then(res => res.json())
+		.then(
+
+			(result) => {
+				let newTweet = result.draft_tweet;
+				let tweets = this.state.tweets.slice();
+				this.setState({
+					tweets: newTweet.concat(tweets)
+				})
+			},
+
+			(error) => {
+				alert('No se pudo');
+			}
+		)
 
 		this.myRef.current.value = '';
 		this.myRef.current.focus();
+
+
+
 	}
+
+
+	componentDidMount(){
+		fetch('https://still-garden-88285.herokuapp.com/draft_tweets')
+		.then(res => res.json())
+		.then(
+
+			(result) => {
+				this.setState({
+					tweets: result.draft_tweets
+				});
+				console.log(result.draft_tweets);
+			},
+
+			(error) => {
+				alert('No hay tweets');
+			}
+		)
+	}
+
+
 
 	render(){
 		return(
@@ -40,11 +97,12 @@ class Twitter extends React.Component{
 				<input type="text" placeholder="What's Happening?" ref={this.myRef} />
 				<button onClick={this.subirTweet}>Tweet</button>
 				<div className="landing">
-					{this.state.tweets.map((tweet, index) => 
+					{this.state.tweets.map((tweet) => 
 							
-						<div key={index}>
-							<span>{tweet.user} | {tweet.date}</span><br/>
-							<span>{tweet.post}</span>
+						<div key={tweet.id}>
+							<span>{tweet.user_name} | {tweet.created_at}</span><br/>
+							<span>{tweet.description}</span>
+							<hr/>
 						</div>
 						
 					)}
