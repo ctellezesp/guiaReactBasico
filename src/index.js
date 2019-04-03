@@ -11,11 +11,35 @@ ReactDOM.render(<App />, document.getElementById('root'));
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
 
+class Box extends React.Component{
+	constructor(props){
+		super(props);
+		this.myRef = React.createRef();
+		this.puchale = this.puchale.bind(this);
+	}
+
+	puchale(){
+		this.props.click(null, this.myRef.current.value);
+		this.myRef.current.value = '';
+		this.myRef.current.focus();
+	}
+
+	render(){
+		return(
+			<div>
+			<input type="text" placeholder="What's Happening?" ref={this.myRef} />
+			<button onClick={this.puchale}>Tweet</button>
+			</div>
+		);
+	}
+
+}
+
 
 class Twitter extends React.Component{
 	constructor(props){
 		super(props);
-		this.myRef = React.createRef();
+		
 		this.subirTweet = this.subirTweet.bind(this);
 		this.componentDidMount = this.componentDidMount.bind(this);
 		this.state = {
@@ -23,7 +47,7 @@ class Twitter extends React.Component{
 		}
 	}
 
-	subirTweet(){
+	subirTweet(e, ref){
 		/*this.setState({
 			tweets: [
 				{user_name: 'Carlos', created_at: new Date().toString(), description: this.myRef.current.value, id: 1000}, 
@@ -34,8 +58,11 @@ class Twitter extends React.Component{
 		let tweet = {
 			user_name: 'Carlos',
 			avatar: 'https://avatars0.githubusercontent.com/u/26472750?s=460&v=4',
-			description: this.myRef.current.value
+			description: ref
 		}
+		console.log(ref);
+		debugger;
+
 
 		let headers = {};
 		headers['Content-Type'] = 'application/json';
@@ -63,8 +90,7 @@ class Twitter extends React.Component{
 			}
 		)
 
-		this.myRef.current.value = '';
-		this.myRef.current.focus();
+		
 
 
 
@@ -94,8 +120,7 @@ class Twitter extends React.Component{
 	render(){
 		return(
 			<div id="main">
-				<input type="text" placeholder="What's Happening?" ref={this.myRef} />
-				<button onClick={this.subirTweet}>Tweet</button>
+				<Box click={this.subirTweet} />
 				<div className="landing">
 					{this.state.tweets.map((tweet) => 
 							
